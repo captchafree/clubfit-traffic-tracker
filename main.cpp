@@ -6,13 +6,12 @@
 #include <opencv2/videoio.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/video.hpp>
-#include <iostream>
  
 using namespace cv;
 using namespace std;
 
 int read() {
-    cv::VideoCapture cap("test_images/sample.mov");
+    VideoCapture cap("test_images/sample.mov");
     if (!cap.isOpened()) {
         cout << "!!! Failed to open file: " << "sample.mov" << endl;
         return -1;
@@ -21,29 +20,46 @@ int read() {
     Mat frame, fgMask;
     Ptr<BackgroundSubtractor> fgbg = createBackgroundSubtractorMOG2();
 
-    for(;;) {
+    vector<Rect> detection_locations;
+    detection_locations.push_back(Rect(235,26, 75,149));
+    detection_locations.push_back(Rect(316,26, 75,149));
+    detection_locations.push_back(Rect(316,200, 75,149));
+    detection_locations.push_back(Rect(397,26, 75,149));
 
+    for(;;) {
         if (!cap.read(frame))             
             break;
 
         fgbg->apply(frame, fgMask);
-        rectangle(fgMask, cv::Point(315,25), cv::Point(400,175),cv::Scalar(255,255,255), 1);
 
-        Mat cropped = fgMask(Rect(316,26, 75, 149));
+        Mat3b result;
+        cvtColor(fgMask, result, COLOR_GRAY2BGR);
+        int index = 1;
+        for(vector<Rect>::iterator it = detection_locations.begin(); it != detection_locations.end(); ++it) {
+            Mat cropped = fgMask(*it);
 
-        vector<Mat> channels;
-        split(cropped, channels);
-        float avg = mean(channels[0])[0];
+            bitwise_not(cropped, cropped);
+            vector<Mat> channels;
+            split(cropped, channels);
 
-        if(avg > 30) {
-            cout << "Object Detected (% 255 = " << avg << ")" << endl;
+            int total = cropped.rows * cropped.cols;
+            float avg = (float(total - countNonZero(cropped)) / total) * 100;
+
+            if(avg > 35) {
+                cout << "Object Detected in box " << index << " (% white = " << avg << ")" << endl;
+                rectangle(result, *it, cv::Scalar(0,255,0), 2);
+            } else {
+                rectangle(result, *it, cv::Scalar(255,255,255), 2);
+            }
+
+            index++;
         }
+        
+        cv::imshow("window", result);
 
-        cv::imshow("window", cropped);
-
-        char key = waitKey(10);
+        char key = waitKey(30);
         if (key == 27) // ESC
-            break;
+           break;
     }
 
     return 0;
