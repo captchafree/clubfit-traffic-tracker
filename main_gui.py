@@ -7,10 +7,12 @@ current_box = None
 
 class Box:
     def __init__(self):
-        self.start_x = 0
-        self.start_y = 0
-        self.width = 0
-        self.height = 0
+        self.start_x = None
+        self.start_y = None
+        self.points = list()
+
+    def add_point(self, x, y):
+        self.points.append((x,y))
 
 class ExampleApp(Frame):
     def __init__(self,master):
@@ -59,6 +61,7 @@ class ExampleApp(Frame):
         current_box = Box()
         current_box.start_x = self.start_x
         current_box.start_y = self.start_y
+        current_box.add_point(self.start_x, self.start_y)
 
     def on_move_press(self, event):
         curX = self.canvas.canvasx(event.x)
@@ -86,8 +89,9 @@ class ExampleApp(Frame):
         global current_box
         global boxes
 
-        current_box.width = abs(current_box.start_x - curX)
-        current_box.height = abs(current_box.start_y - curY)
+        current_box.add_point(curX, current_box.start_y)
+        current_box.add_point(curX, curY)
+        current_box.add_point(current_box.start_x, curY)
 
         boxes.append(current_box)
         current_box = None
@@ -97,9 +101,16 @@ def on_closing():
     config = open('config.csv','w') 
 
     for box in boxes:
-        config.write("{},{},{},{}\n".format(int(box.start_x), int(box.start_y), int(box.width), int(box.height)))
-    config.close()
+        result = ""
+        points = box.points
+        for point in points:
+            result = result + str(int(point[0])) + "," + str(int(point[1])) + ","
+        
+        result = result[:-1]
+        result = result + "\n"
+        config.write(result)
 
+    config.close()
     root.destroy()
 
 if __name__ == "__main__":
