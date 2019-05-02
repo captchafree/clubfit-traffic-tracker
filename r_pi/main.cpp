@@ -9,7 +9,7 @@
 
 #include "image_processor.hpp"
 
-bool USE_DISPLAY = true;
+bool USE_DISPLAY = false;
 
 int read() {
     // Configure capture settings
