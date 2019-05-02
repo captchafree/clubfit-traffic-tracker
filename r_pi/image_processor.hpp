@@ -17,49 +17,38 @@ class ImageProcessor {
     public:
         ImageProcessor() {
             this->fgbg = cv::createBackgroundSubtractorMOG2();
-
-            Config config;
-            this->machines = config.get_machines();
-
-            // std::ifstream file("config.csv");
-            // CSVRow row;
-            // while(file >> row) {
-            //     std::vector<cv::Point> corners;
-            //     for(int i = 0; i < row.size(); i+=2) {
-            //         corners.push_back(cv::Point(stoi(row[i]), stoi(row[i+1])));
-            //     }
-            //     this->detection_locations.push_back(corners);
-            // }
         }
 
         /*
         Process the frame and return the result to show
         */
         cv::Mat3b process(cv::Mat const &frame) {
-            //Show original footage
-            //cv::imshow("Original", frame);
+            // Show original footage
+            // cv::imshow("Original", frame);
             
-            //Apply frame to background subtractor
+            // Apply frame to background subtractor
             this->fgbg->apply(frame, this->fgMask);
 
             cv::Mat3b result;
-            //Convert single-channel image to BGR
+            // Convert single-channel image to BGR
             cv::cvtColor(this->fgMask, result, cv::COLOR_GRAY2BGR);
 
-            //Apply binary threshold
+            // Apply binary threshold
             cv::threshold(result, result, 250, 255, 0);
+
+            // Remove noise
             cv::erode(result, result, cv::Mat(), cv::Point(-1, -1), 2, 1, 1);
             cv::dilate(result, result, cv::Mat(), cv::Point(-1, -1), 3, 1, 1);
 
-            int index = 1;
-            //Iterate over each detection location
-            for(std::vector<Machine>::iterator it = this->machines.begin(); it != this->machines.end(); ++it) {
+            // Iterate over each detection location
+            std::vector<Machine> machines = this->config.get_machines();
+            for(std::vector<Machine>::iterator it = machines.begin(); it != machines.end(); ++it) {
                 
                 std::string name = it->name;
                 std::vector<cv::Point> points = it->detection_locations;
 
 
-                //Generate mask
+                // Generate mask
                 cv::Mat mask(result.size().height, result.size().width, CV_8UC3, cv::Scalar(0, 0, 0));
 
                 int num_points = points.size();
@@ -75,16 +64,16 @@ class ImageProcessor {
                 cv::Mat cropped;
                 cv::bitwise_and(result, mask, cropped);
 
-                //Get bounding box
+                // Get bounding box
                 cv::Rect bounding_box = cv::boundingRect(points);
                 cropped = cropped(bounding_box);
                 
-                //Invert image
+                // Invert image
                 cv::Mat cropped_grayscale;
                 cv::cvtColor(cropped, cropped_grayscale, cv::COLOR_BGR2GRAY);
                 int white = cv::countNonZero(cropped_grayscale);
 
-                //Calculate percent of image that is white pixels
+                // Calculate percent of image that is white pixels
                 int total = cv::contourArea(points);
                 std::vector<cv::Mat> channels;
                 cv::split(cropped, channels);
@@ -93,14 +82,11 @@ class ImageProcessor {
                 contours.push_back(points);
                 
                 if(avg > 35) {
-                    //std::cout << "Object Detected in box " << index << " (% white = " << avg << ")" << std::endl;
-                    std::cout << "Machine `" << name << "` is in use" << std::endl;
+                    std::cout << "Machine `" << name << "` at `" << this->config.get_company() << "` is in use" << std::endl;
                     cv::drawContours(result, contours, 0, cv::Scalar(0,255,0), 1, 8);
                 } else {
                     cv::drawContours(result, contours, 0, cv::Scalar(255,255,255), 1, 8);
                 }
-
-                index++;
             }
 
             return result;
@@ -110,5 +96,5 @@ class ImageProcessor {
         cv::Ptr<cv::BackgroundSubtractor> fgbg;
         cv::Mat fgMask;
 
-        std::vector<Machine> machines;
+        Config config;
 };

@@ -12,6 +12,8 @@
 bool USE_DISPLAY = false;
 
 int read() {
+    std::cout << "Configuring camera settings..." << std::endl;
+
     // Configure capture settings
     cv::VideoCapture cap(0);
     cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280);
@@ -26,6 +28,9 @@ int read() {
     //Main loop
     cv::Mat frame;
     ImageProcessor processor;
+
+    std::cout << "Ready!\n" << std::endl;
+
     for(;;) {
         // Attempt to read in frame
         if (!cap.read(frame)) {

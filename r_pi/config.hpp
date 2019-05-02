@@ -19,12 +19,21 @@ using json = nlohmann::json;
 class Config {
     public:
         Config() {
+            std::cout << "Loading config file..." << std::endl;
             this->load_config();
         }
 
         std::vector<Machine> get_machines() {
             std::vector<Machine> copy = this->machines;
             return copy;
+        }
+
+        std::string get_company() {
+            return this->company;
+        }
+
+        std::string get_location() {
+            return this->location;
         }
 
     private:
@@ -63,35 +72,5 @@ class Config {
                 mach.detection_locations = points_;
                 this->machines.push_back(mach);
             }
-
-            // std::ifstream file("config/detection_areas.csv");
-            // CSVRow row;
-            // while(file >> row) {
-            //     std::string name = row[0];
-
-            //     std::vector<cv::Point> corners;
-            //     for(int i = 1; i < row.size(); i+=2) {
-            //         corners.push_back(cv::Point(stoi(row[i]), stoi(row[i+1])));
-            //     }
-
-            //     Machine mach;
-            //     mach.name = name;
-            //     mach.detection_locations = corners;
-            //     this->machines.push_back(mach);
-            // }
-
-            // Print machines
-            // std::cout << "Machines:" << std::endl;
-            // for(int i = 0; i < this->machines.size(); i++)
-            //     std::cout << this->machines[i].name << std::endl;
-
-            // std::ifstream config("config/config.csv");
-            // while(config >> row) {
-            //     std::string company = row[0];
-            //     std::string location = row[1];
-
-            //     this->company = company;
-            //     this->location = location;
-            // }
         }
 };
