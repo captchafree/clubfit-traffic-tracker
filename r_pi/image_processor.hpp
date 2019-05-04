@@ -1,9 +1,4 @@
-#include <iterator>
-#include <iostream>
 #include <fstream>
-#include <sstream>
-#include <vector>
-#include <string>
 
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
@@ -21,7 +16,7 @@ class ImageProcessor {
         }
 
         /*
-        Process the frame and return the result to show
+        Process the frame and return the result
         */
         cv::Mat3b process(cv::Mat const &frame) {
             Config config = Config::get_instance();
@@ -84,7 +79,7 @@ class ImageProcessor {
                 std::vector<std::vector<cv::Point>> contours;
                 contours.push_back(points);
                 
-                if(avg > 35) {
+                if(avg > 5) {
                     std::cout << "Machine `" << name << "` at `" << config.get_company() << "` is in use" << std::endl;
                     occupied_machines.push_back(*it);
                     cv::drawContours(result, contours, 0, cv::Scalar(0,255,0), 1, 8);
@@ -99,6 +94,9 @@ class ImageProcessor {
         }
 
     private:
+        // Background subtractor used in the algorithm
         cv::Ptr<cv::BackgroundSubtractor> fgbg;
+
+        // Mask containing information about the image's background
         cv::Mat fgMask;
 };

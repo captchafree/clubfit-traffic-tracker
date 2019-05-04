@@ -1,19 +1,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include <iterator>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <vector>
-#include <string>
-
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/imgproc.hpp>
-#include <opencv2/videoio.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/video.hpp>
-
 #include "machine.hpp"
 
 #include <nlohmann/json.hpp>
@@ -31,15 +18,24 @@ class Config {
             return myInstance;
         }
 
+        /*
+        Returns the machines specified in the config file
+        */
         std::vector<Machine> get_machines() {
             std::vector<Machine> copy = this->machines;
             return copy;
         }
 
+        /*
+        Returns the company specified in the config file
+        */
         std::string get_company() {
             return this->company;
         }
 
+        /*
+        Returns the location specified in the config file
+        */
         std::string get_location() {
             return this->location;
         }

@@ -1,13 +1,6 @@
 #ifndef MONGO_H
 #define MONGO_H
 
-#include <iterator>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <vector>
-#include <string>
-
 #include "machine.hpp"
 #include "curl/curl.h"
 
