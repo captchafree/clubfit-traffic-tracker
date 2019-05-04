@@ -43,6 +43,7 @@ class ImageProcessor {
 
             // Iterate over each detection location
             std::vector<Machine> machines = this->config.get_machines();
+            std::vector<Machine> occupied_machines;
             for(std::vector<Machine>::iterator it = machines.begin(); it != machines.end(); ++it) {
                 
                 std::string name = it->name;
@@ -84,12 +85,14 @@ class ImageProcessor {
                 
                 if(avg > 35) {
                     std::cout << "Machine `" << name << "` at `" << this->config.get_company() << "` is in use" << std::endl;
-                    Mongo::add_machine_data(*it);
+                    occupied_machines.push_back(*it);
                     cv::drawContours(result, contours, 0, cv::Scalar(0,255,0), 1, 8);
                 } else {
                     cv::drawContours(result, contours, 0, cv::Scalar(255,255,255), 1, 8);
                 }
             }
+
+            Mongo::add_machine_data(occupied_machines);
 
             return result;
         }

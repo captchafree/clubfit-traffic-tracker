@@ -16,7 +16,7 @@ using json = nlohmann::json;
 
 class Mongo {
     public:
-        static void add_machine_data(const Machine machine) {
+        static void add_machine_data(const std::vector<Machine> machines) {
             Config config;
 
             //Create request
@@ -33,15 +33,22 @@ class Mongo {
             curl_easy_setopt(hnd, CURLOPT_WRITEFUNCTION, write_data);
 
             // Generate payload
-            json payload;
-            payload["company"] = config.get_company();
-            payload["location"] = config.get_location();
-            payload["machine"] = machine.name;
+            std::vector<json> payload;
+            for(int i = 0; i < machines.size(); i++) {
+                json machine;
+                machine["company"] = config.get_company();
+                machine["location"] = config.get_location();
+                machine["machine"] = machines[i].name;
 
-            std::time_t current_time = std::time(nullptr);
-            payload["time"] = current_time;
+                std::time_t current_time = std::time(nullptr);
+                machine["time"] = current_time;
 
-            std::string result = payload.dump();
+                payload.push_back(machine);
+            }
+
+            json data;
+            data["data"] = payload;
+            std::string result = data.dump();
             curl_easy_setopt(hnd, CURLOPT_POSTFIELDS, result.c_str());
 
             //Send request
