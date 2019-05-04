@@ -17,7 +17,7 @@ using json = nlohmann::json;
 class Mongo {
     public:
         static void add_machine_data(const std::vector<Machine> machines) {
-            Config config;
+            Config config = Config::get_instance();
 
             //Create request
             CURL *hnd = curl_easy_init();
@@ -30,6 +30,7 @@ class Mongo {
             headers = curl_slist_append(headers, "Content-Type: application/json");
             curl_easy_setopt(hnd, CURLOPT_HTTPHEADER, headers);
 
+            // Redirect response output
             curl_easy_setopt(hnd, CURLOPT_WRITEFUNCTION, write_data);
 
             // Generate payload
@@ -51,7 +52,7 @@ class Mongo {
             std::string result = data.dump();
             curl_easy_setopt(hnd, CURLOPT_POSTFIELDS, result.c_str());
 
-            //Send request
+            // Send request
             CURLcode ret = curl_easy_perform(hnd);
         }
 

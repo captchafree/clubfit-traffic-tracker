@@ -24,6 +24,7 @@ class ImageProcessor {
         Process the frame and return the result to show
         */
         cv::Mat3b process(cv::Mat const &frame) {
+            Config config = Config::get_instance();
             // Show original footage
             // cv::imshow("Original", frame);
             
@@ -42,7 +43,7 @@ class ImageProcessor {
             cv::dilate(result, result, cv::Mat(), cv::Point(-1, -1), 3, 1, 1);
 
             // Iterate over each detection location
-            std::vector<Machine> machines = this->config.get_machines();
+            std::vector<Machine> machines = config.get_machines();
             std::vector<Machine> occupied_machines;
             for(std::vector<Machine>::iterator it = machines.begin(); it != machines.end(); ++it) {
                 
@@ -84,7 +85,7 @@ class ImageProcessor {
                 contours.push_back(points);
                 
                 if(avg > 35) {
-                    std::cout << "Machine `" << name << "` at `" << this->config.get_company() << "` is in use" << std::endl;
+                    std::cout << "Machine `" << name << "` at `" << config.get_company() << "` is in use" << std::endl;
                     occupied_machines.push_back(*it);
                     cv::drawContours(result, contours, 0, cv::Scalar(0,255,0), 1, 8);
                 } else {
@@ -100,6 +101,4 @@ class ImageProcessor {
     private:
         cv::Ptr<cv::BackgroundSubtractor> fgbg;
         cv::Mat fgMask;
-
-        Config config;
 };

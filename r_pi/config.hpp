@@ -20,10 +20,15 @@
 using json = nlohmann::json;
 
 class Config {
-    public:
-        Config() {
-            //std::cout << "Loading config file..." << std::endl;
-            this->load_config();
+     public:
+        static Config& get_instance() {
+            // Since it's a static variable, if the class has already been created,
+            // it won't be created again.
+            // And it **is** thread-safe in C++11.
+            static Config myInstance;
+
+            // Return a reference to our instance.
+            return myInstance;
         }
 
         std::vector<Machine> get_machines() {
@@ -37,6 +42,12 @@ class Config {
 
         std::string get_location() {
             return this->location;
+        }
+
+    protected:
+        Config() {
+            std::cout << "Loading config file..." << std::endl;
+            this->load_config();
         }
 
     private:
