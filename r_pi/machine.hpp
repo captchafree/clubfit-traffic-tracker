@@ -1,3 +1,6 @@
+#ifndef MACHINE_H
+#define MACHINE_H
+
 #include <iterator>
 #include <iostream>
 #include <fstream>
@@ -11,3 +14,5 @@ struct Machine {
     std::string name;
     std::vector<cv::Point> detection_locations;
 };
+
+#endif

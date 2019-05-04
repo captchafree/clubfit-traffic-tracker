@@ -12,6 +12,7 @@
 #include <opencv2/video.hpp>
 
 #include "config.hpp"
+#include "mongo.hpp"
 
 class ImageProcessor {
     public:
@@ -83,6 +84,7 @@ class ImageProcessor {
                 
                 if(avg > 35) {
                     std::cout << "Machine `" << name << "` at `" << this->config.get_company() << "` is in use" << std::endl;
+                    Mongo::add_machine_data(*it);
                     cv::drawContours(result, contours, 0, cv::Scalar(0,255,0), 1, 8);
                 } else {
                     cv::drawContours(result, contours, 0, cv::Scalar(255,255,255), 1, 8);

@@ -1,3 +1,6 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
 #include <iterator>
 #include <iostream>
 #include <fstream>
@@ -19,7 +22,7 @@ using json = nlohmann::json;
 class Config {
     public:
         Config() {
-            std::cout << "Loading config file..." << std::endl;
+            //std::cout << "Loading config file..." << std::endl;
             this->load_config();
         }
 
@@ -74,3 +77,5 @@ class Config {
             }
         }
 };
+
+#endif
