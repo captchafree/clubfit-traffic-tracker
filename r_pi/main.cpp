@@ -8,6 +8,7 @@
 
 #include "image_processor.hpp"
 
+// Flag to specify if display should be used.
 bool USE_DISPLAY = false;
 
 int read() {
@@ -28,12 +29,22 @@ int read() {
     cv::Mat frame;
     ImageProcessor processor;
 
-    std::cout << "Ready!\n" << std::endl;
-
+    std::cout << "Establishing background... This can take a minute!" << std::endl;
+    int frames_captured = 0;
     for(;;) {
         // Attempt to read in frame
-        if (!cap.read(frame)) {
+        if(!cap.read(frame)) {
             continue;
+        }
+
+        if(frames_captured <= 50) {
+            frames_captured++;
+            if(frames_captured == 50) {
+                std::cout << "Ready!\n" << std::endl;
+            } else {
+                processor.setup(frame);
+                continue;
+            }
         }
 
         // process frame
@@ -67,6 +78,9 @@ int main(int argc, char *argv[]) {
             }
         }
     }
+
+    // Load config file
+    Config c = Config::get_instance();
 
     // Read from camera and process
     read();

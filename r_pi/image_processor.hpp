@@ -15,6 +15,10 @@ class ImageProcessor {
             this->fgbg = cv::createBackgroundSubtractorMOG2();
         }
 
+        void setup(cv::Mat const &frame) {
+            this->fgbg->apply(frame, this->fgMask);
+        }
+
         /*
         Process the frame and return the result
         */
