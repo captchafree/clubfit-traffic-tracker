@@ -25,7 +25,7 @@ int read() {
         return -1;
     }
 
-    //Main loop
+    // Main loop
     cv::Mat frame;
     ImageProcessor processor;
 
@@ -47,7 +47,7 @@ int read() {
             }
         }
 
-        // process frame
+        // Process frame
         cv::Mat3b result = processor.process(frame);
         
         if(USE_DISPLAY) {

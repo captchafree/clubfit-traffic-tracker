@@ -12,7 +12,8 @@
 class ImageProcessor {
     public:
         ImageProcessor() {
-            this->fgbg = cv::createBackgroundSubtractorMOG2();
+            // 500 history, 16 varThreshold, no shadow detection
+            this->fgbg = cv::createBackgroundSubtractorMOG2(500, 16, false);
         }
 
         void setup(cv::Mat const &frame) {
@@ -33,9 +34,6 @@ class ImageProcessor {
             cv::Mat3b result;
             // Convert single-channel image to BGR
             cv::cvtColor(this->fgMask, result, cv::COLOR_GRAY2BGR);
-
-            // Apply binary threshold
-            cv::threshold(result, result, 250, 255, 0);
 
             // Remove noise
             cv::erode(result, result, cv::Mat(), cv::Point(-1, -1), 2, 1, 1);
