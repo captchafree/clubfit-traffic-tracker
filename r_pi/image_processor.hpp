@@ -1,3 +1,6 @@
+#ifndef IMG_PROC_H
+#define IMG_PROC_H
+
 #include <fstream>
 
 #include <opencv2/imgcodecs.hpp>
@@ -9,6 +12,7 @@
 #include "config.hpp"
 #include "mongo.hpp"
 
+// TODO: Move background setup code from main.cpp to here
 class ImageProcessor {
     public:
         ImageProcessor() {
@@ -102,3 +106,5 @@ class ImageProcessor {
         // Mask containing information about the image's background
         cv::Mat fgMask;
 };
+
+#endif
