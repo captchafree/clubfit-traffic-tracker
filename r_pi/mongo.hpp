@@ -25,6 +25,7 @@ class Mongo {
             // Redirect response output
             curl_easy_setopt(hnd, CURLOPT_WRITEFUNCTION, write_data);
 
+            // Generate request body
             std::string body = generate_body(machines);
             curl_easy_setopt(hnd, CURLOPT_POSTFIELDS, body.c_str());
 
@@ -36,6 +37,9 @@ class Mongo {
         static std::string generate_body(const std::vector<Machine> machines) {
             Config config = Config::get_instance();
 
+            json result;
+
+            // If there are no machines insert just one document with a null machine into mongo
             if(machines.empty()) {
                 json body;
                 body["company"] = config.get_company();
@@ -44,26 +48,29 @@ class Mongo {
 
                 std::time_t current_time = std::time(nullptr);
                 body["time"] = current_time;
-                return body;
+
+                std::vector<json> list;
+                list.push_back(body);
+                result["data"] = list;
+            } else {
+                std::vector<json> payload;
+                // Add a json object for each machine
+                for(int i = 0; i < machines.size(); i++) {
+                    json machine;
+                    machine["company"] = config.get_company();
+                    machine["location"] = config.get_location();
+                    machine["machine"] = machines[i].name;
+
+                    std::time_t current_time = std::time(nullptr);
+                    machine["time"] = current_time;
+
+                    payload.push_back(machine);
+                }
+
+                result["data"] = payload;
             }
 
-            std::vector<json> payload;
-            for(int i = 0; i < machines.size(); i++) {
-                json machine;
-                machine["company"] = config.get_company();
-                machine["location"] = config.get_location();
-                machine["machine"] = machines[i].name;
-
-                std::time_t current_time = std::time(nullptr);
-                machine["time"] = current_time;
-
-                payload.push_back(machine);
-            }
-
-            json data;
-            data["data"] = payload;
-            std::string result = data.dump();
-            return result;
+            return result.dump();
         }
 
         static size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp) {

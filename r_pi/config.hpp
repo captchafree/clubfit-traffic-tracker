@@ -79,7 +79,7 @@ class Config {
                     int y = point["y"];
                     points_.push_back(cv::Point(x, y));
                 }
-                mach.detection_locations = points_;
+                mach.contour_points = points_;
                 this->machines.push_back(mach);
             }
         }

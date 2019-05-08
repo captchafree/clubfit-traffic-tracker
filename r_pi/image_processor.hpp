@@ -49,7 +49,7 @@ class ImageProcessor {
             for(std::vector<Machine>::iterator it = machines.begin(); it != machines.end(); ++it) {
                 
                 std::string name = it->name;
-                std::vector<cv::Point> points = it->detection_locations;
+                std::vector<cv::Point> points = it->contour_points;
 
 
                 // Generate mask
