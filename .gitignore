@@ -1,5 +1,8 @@
 r_pi/main
 
+# VSCode
+.vscode/*
+
 # Prerequisites
 *.d
 
