@@ -6,6 +6,15 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
+struct PointOutOfBoundsException : public std::exception {
+	const char * what () const throw () {
+    	return "Point out of bounds. Value is constrained to that of the camera's resolution.";
+    }
+};
+
+/*
+Handles loading/saving to the config file
+*/
 class Config {
      public:
         static Config& get_instance() {
@@ -21,23 +30,36 @@ class Config {
         /*
         Returns the machines specified in the config file
         */
-        std::vector<Machine> get_machines() {
-            std::vector<Machine> copy = this->machines;
-            return copy;
+        std::vector<Machine> get_machines() const {
+            return this->machines;
         }
 
         /*
         Returns the company specified in the config file
         */
-        std::string get_company() {
-            return this->company;
+        std::string get_company() const {
+            return data["company"];
         }
 
         /*
         Returns the location specified in the config file
         */
-        std::string get_location() {
-            return this->location;
+        std::string get_location() const {
+            return data["location"];
+        }
+
+        /*
+        Returns the location specified in the config file
+        */
+        int get_camera_resolution_width() const {
+            return data["camera_settings"]["resolution"]["width"];
+        }
+
+        /*
+        Returns the location specified in the config file
+        */
+        int get_camera_resolution_height() const {
+            return data["camera_settings"]["resolution"]["height"];
         }
 
     protected:
@@ -47,9 +69,10 @@ class Config {
         }
 
     private:
-        std::string company;
-        std::string location;
+        // The config file represented as a json object
+        json data;
 
+        // A list of the machines to be monitored
         std::vector<Machine> machines;
 
         /*
@@ -57,30 +80,43 @@ class Config {
         */
         void load_config() {
             
-            std::ifstream config("config/config.json", std::ifstream::binary);
-            auto json = json::parse(config);
+            std::ifstream config_file("config/config.json", std::ifstream::binary);
+            json data = json::parse(config_file);
+            this->data = data;
 
-            this->company = json["company"];
-            this->location = json["location"];
+            json machines = data["machines"];
 
-            auto machines = json["machines"];
+            for(json machine : machines) {
+                Machine current_machine;
 
-            for(int i = 0; i < machines.size(); i++) {
-                Machine mach;
-                auto mach_data = machines[i];
-
-                mach.name = mach_data["name"];
-                auto points = mach_data["points"];
+                current_machine.name = machine["name"];
+                json machine_points = machine["points"];
 
                 std::vector<cv::Point> points_;
-                for(int j = 0; j < points.size(); j++) {
-                    auto point = points[j];
+                for(auto point : machine_points) {
                     int x = point["x"];
                     int y = point["y"];
-                    points_.push_back(cv::Point(x, y));
+                    current_machine.contour_points.push_back(cv::Point(x, y));
                 }
-                mach.contour_points = points_;
-                this->machines.push_back(mach);
+                this->machines.push_back(current_machine);
+            }
+
+            this->verify_integrity();
+        }
+
+        /*
+        Verifies that the values in the config file are valid
+        */
+        void verify_integrity() {
+            int width = this->get_camera_resolution_width();
+            int height = this->get_camera_resolution_height();
+
+            for (Machine mach : this->machines) {
+                for (auto point : mach.contour_points) {
+                    if (point.x >= width || point.x < 0 || point.y >= height || point.y < 0) {
+                        throw PointOutOfBoundsException();
+                    }
+                }
             }
         }
 };

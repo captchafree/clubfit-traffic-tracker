@@ -14,10 +14,13 @@ bool USE_DISPLAY = false;
 int read() {
     std::cout << "Configuring camera settings..." << std::endl;
 
+    // Load config file
+    Config config = Config::get_instance();
+
     // Configure capture settings
     cv::VideoCapture cap(0);
-    cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280);
-    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720);
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, config.get_camera_resolution_width());
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, config.get_camera_resolution_height());
 
     // Check if capture is properly set up
     if (!cap.isOpened()) {
@@ -78,9 +81,6 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-
-    // Load config file
-    Config c = Config::get_instance();
 
     // Read from camera and process
     read();

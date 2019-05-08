@@ -1,6 +1,12 @@
 {
   "company": "clubfit",
   "location": "cardio",
+  "camera_settings": {
+    "resolution": {
+      "width": 1920,
+      "height": 1080
+    }
+  },
   "machines": [
     {
       "name": "Left Seat",

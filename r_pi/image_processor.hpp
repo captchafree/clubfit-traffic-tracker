@@ -46,7 +46,7 @@ class ImageProcessor {
             // Iterate over each detection location
             std::vector<Machine> machines = config.get_machines();
             std::vector<Machine> occupied_machines;
-            for(std::vector<Machine>::iterator it = machines.begin(); it != machines.end(); ++it) {
+            for(auto it = machines.begin(); it != machines.end(); ++it) {
                 
                 std::string name = it->name;
                 std::vector<cv::Point> points = it->contour_points;
